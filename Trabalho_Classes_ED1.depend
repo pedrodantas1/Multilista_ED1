@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1648578074 source:e:\documentos\programacao\projetos_c_c++\trabalho_classes_ed1\main.cpp
+	<iostream>
+	<cstdio>
+	<cstdlib>
+	<string>
+	<cctype>
+	<windows.h>
+	<conio2.h>
+
