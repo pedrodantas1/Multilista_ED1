@@ -8,8 +8,8 @@
 using namespace std;
 
 typedef struct noAluno{
-    string nome;
-    int idade, matricula;
+    string nome, matricula;
+    int idade;
     struct noAluno *proxAluno, *antAluno;
 }tipoAluno;
 
@@ -32,6 +32,7 @@ typedef struct gerencLista{
 void waitAndClear(int tempo);
 void inicializa(tipoLista *lista);
 void lerNumero(int& numero);
+int menuPrincipal();
 void menuCadastroClasse(tipoLista* lista);
 int cadastrarClasse(tipoLista *lista, string prof, string etapa, char turma, int serie);
 void matriculaAlunoNaClasse(tipoLista* lista);
@@ -57,21 +58,7 @@ int main(){
 
     inicializa(&lista);
     do{
-        printf("\n============================ Menu ============================\n\n");
-        printf("1  - Cadastrar classe\n");
-        printf("2  - Matricular aluno em determinada classe\n");
-        printf("3  - Remover aluno de classe\n");
-        printf("4  - Exibir listagem de alunos matriculados em uma classe\n");
-        printf("5  - Exibir lista de classes\n");
-        printf("6  - Remover classe\n");
-        printf("7  - Pesquisar e exibir qual a classe de um aluno\n");
-        printf("99 - Para sair do programa\n");
-        printf("\n==============================================================\n\n");
-        printf("-> Escolha uma opção: ");
-        printf("\n\n==============================================================\n\n");
-        gotoxy(23, 15);
-        lerNumero(opcao);
-
+        opcao = menuPrincipal();
         int delay = 500;
         switch (opcao){
         case 1:
@@ -157,8 +144,27 @@ void lerNumero(int& numero){
     numero = atoi(aux);
 }
 
+int menuPrincipal(){
+    int opcao;
+    printf("\n============================ Menu ============================\n\n");
+    printf("1  - Cadastrar classe\n");
+    printf("2  - Matricular aluno em determinada classe\n");
+    printf("3  - Remover aluno de classe\n");
+    printf("4  - Exibir listagem de alunos matriculados em uma classe\n");
+    printf("5  - Exibir lista de classes\n");
+    printf("6  - Remover classe\n");
+    printf("7  - Pesquisar e exibir qual a classe de um aluno\n");
+    printf("99 - Para sair do programa\n");
+    printf("\n==============================================================\n\n");
+    printf("-> Escolha uma opção: ");
+    printf("\n\n==============================================================\n\n");
+    gotoxy(23, 15);
+    lerNumero(opcao);
+
+    return opcao;
+}
+
 void menuCadastroClasse(tipoLista* lista){
-    string etapasEnsino[3] = {"Ensino Fundamental I", "Ensino Fundamental II", "Ensino Médio"};
     string prof, etapa;
     char turma;
     int serie, nEtapa;
@@ -192,11 +198,11 @@ void menuCadastroClasse(tipoLista* lista){
     //Atribui a string correta de acordo com a etapa
     if (nEtapa == 1){
         if (serie >= 1 && serie <= 5)
-            etapa = etapasEnsino[0];
+            etapa = "Ensino Fundamental I";
         else if (serie >= 6 && serie <= 9)
-            etapa = etapasEnsino[1];
+            etapa = "Ensino Fundamental II";
     }else{
-        etapa = etapasEnsino[2];
+        etapa = "Ensino Médio";
     }
     printf("\n>>> Esta classe pertence ao %s.\n", etapa.c_str());
     printf("\n===============================================================\n");
@@ -282,7 +288,6 @@ void matriculaAlunoNaClasse(tipoLista* lista){
 
 tipoClasse* pesquisaClasse(tipoLista* lista){
     //Interface
-    string etapasEnsino[3] = {"Ensino Fundamental I", "Ensino Fundamental II", "Ensino Médio"};
     string etapa;
     int serie, nEtapa;
     char turma;
@@ -311,11 +316,11 @@ tipoClasse* pesquisaClasse(tipoLista* lista){
     //Atribui a string correta de acordo com a etapa
     if (nEtapa == 1){
         if (serie >= 1 && serie <= 5)
-            etapa = etapasEnsino[0];
+            etapa = "Ensino Fundamental I";
         else if (serie >= 6 && serie <= 9)
-            etapa = etapasEnsino[1];
+            etapa = "Ensino Fundamental II";
     }else{
-        etapa = etapasEnsino[2];
+        etapa = "Ensino Médio";
     }
     printf("\n===============================================================\n");
     printf("\n>>> Qual é a turma? ");
@@ -336,8 +341,8 @@ tipoClasse* pesquisaClasse(tipoLista* lista){
 
 tipoAluno* pedeDadosAluno(){
     //Interface
-    string nome;
-    int idade, matricula;
+    string nome, matricula;
+    int idade;
     printf("\n===============================================================");
     printf("\nDados do aluno:");
     printf("\n===============================================================\n");
@@ -348,7 +353,7 @@ tipoAluno* pedeDadosAluno(){
     lerNumero(idade);
     printf("\n===============================================================\n");
     printf("\n* Digite o número da matrícula do aluno: ");
-    lerNumero(matricula);
+    getline(cin, matricula);
 
     tipoAluno* aluno = new tipoAluno;
     if (aluno == NULL)
@@ -424,12 +429,12 @@ void removeAlunoDaClasse(tipoLista* lista){
 }
 
 tipoAluno* pesquisaAluno(tipoClasse* classe){
-    int matricula;
+    string matricula;
     printf("\n===============================================================");
     printf("\nPesquisa de aluno:");
     printf("\n===============================================================\n");
     printf("\n* Digite o número da matrícula do aluno a ser removido: ");
-    lerNumero(matricula);
+    getline(cin, matricula);
 
     tipoAluno* atual = classe->primeiroAluno;
     while (atual != NULL){
@@ -491,7 +496,7 @@ void exibirAlunos(tipoClasse* classe){
     while (atual != NULL){
         printf("   Nome do aluno: %s\n", atual->nome.c_str());
         printf("   Idade: %d\n", atual->idade);
-        printf("   Número da matrícula: %d\n\n", atual->matricula);
+        printf("   Número da matrícula: %s\n\n", atual->matricula.c_str());
         atual = atual->proxAluno;
     }
     printf("===========================================================================\n");
