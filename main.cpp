@@ -36,6 +36,7 @@ int menuPrincipal();
 void menuCadastroClasse(tipoLista* lista);
 int cadastrarClasse(tipoLista *lista, string prof, string etapa, char turma, int serie);
 void matriculaAlunoNaClasse(tipoLista* lista);
+tipoClasse* pedeClasse(tipoLista* lista);
 tipoClasse* pesquisaClasse(tipoLista* lista);
 tipoAluno* pedeDadosAluno();
 int vinculaAlunoAClasse(tipoAluno* aluno, tipoClasse* classe);
@@ -46,6 +47,8 @@ void exibirListaAlunosDaClasse(tipoLista* lista);
 void exibirAlunos(tipoClasse* classe);
 void exibirListaClasses(tipoLista *lista);
 void exibirClasse(tipoClasse* classe);
+void removeClasse(tipoLista* lista);
+int desvinculaClasseDaLista(tipoClasse* classe, tipoLista* lista);
 
 //------------------------------------------------------------
 
@@ -103,6 +106,7 @@ int main(){
                 break;
             }
             //Remover classe (remover todos os alunos antes)
+            removeClasse(&lista);
             waitAndClear(delay);
             break;
         case 7:
@@ -249,19 +253,7 @@ int cadastrarClasse(tipoLista *lista, string prof, string etapa, char turma, int
 
 void matriculaAlunoNaClasse(tipoLista* lista){
     //Pesquisar a classe
-    tipoClasse* classe;
-    char op;
-    do{
-        waitAndClear(500);
-        op = ' ';
-        classe = pesquisaClasse(lista);
-        if (classe == NULL){
-            printf("\n# Esta classe não existe!!! #\n");
-            printf("\n>> Aperte <ENTER> para pesquisar novamente.\n");
-            printf("\n>> Aperte qualquer outra tecla para voltar ao menu principal.\n");
-            op = getch();
-        }
-    }while (op == '\r');
+    tipoClasse* classe = pedeClasse(lista);
 
     if (classe == NULL)
         return;
@@ -286,6 +278,25 @@ void matriculaAlunoNaClasse(tipoLista* lista){
     getch();
 }
 
+tipoClasse* pedeClasse(tipoLista* lista){
+    tipoClasse* classe;
+    char op;
+    do{
+        waitAndClear(500);
+        op = ' ';
+        classe = pesquisaClasse(lista);
+        if (classe == NULL){
+            printf("\n# Esta classe não existe!!! #\n");
+            printf("\n===============================================================\n");
+            printf("\n>> Aperte <ENTER> para pesquisar novamente.\n");
+            printf("\n>> Aperte qualquer outra tecla para voltar ao menu principal.\n");
+            op = getch();
+        }
+    }while (op == '\r');
+
+    return classe;
+}
+
 tipoClasse* pesquisaClasse(tipoLista* lista){
     //Interface
     string etapa;
@@ -305,10 +316,10 @@ tipoClasse* pesquisaClasse(tipoLista* lista){
     }while (nEtapa != 1 && nEtapa != 2);
 
     printf("\n===============================================================\n");
-    printf("\n>>> Qual a série do aluno? ");
+    printf("\n>>> Qual a série? ");
     do{
-        gotoxy(28, 13); printf("                    ");
-        gotoxy(28, 13);
+        gotoxy(19, 13); printf("                    ");
+        gotoxy(19, 13);
         lerNumero(serie);
         if (nEtapa == 2 && (serie < 1 || serie > 3))
             serie = 0;
@@ -329,6 +340,7 @@ tipoClasse* pesquisaClasse(tipoLista* lista){
     turma = toupper(turma);
     printf("\n===============================================================\n");
 
+    //Pesquisa efetivamente a classe (se existir)
     tipoClasse* atual = lista->inicio;
     while (atual != NULL){
         if (atual->etapa == etapa && atual->serie == serie && atual->turma == turma){
@@ -381,26 +393,14 @@ int vinculaAlunoAClasse(tipoAluno* aluno, tipoClasse* classe){
 
 void removeAlunoDaClasse(tipoLista* lista){
     //Pesquisa a classe na qual se encontra o aluno
-    tipoClasse* classe;
-    char op;
-    do{
-        waitAndClear(500);
-        op = ' ';
-        classe = pesquisaClasse(lista);
-        if (classe == NULL){
-            printf("\n# Esta classe não existe!!! #\n");
-            printf("\n>> Aperte <ENTER> para pesquisar novamente.\n");
-            printf("\n>> Aperte qualquer outra tecla para voltar ao menu principal.\n");
-            op = getch();
-        }
-    }while (op == '\r');
-
+    tipoClasse* classe = pedeClasse(lista);
     if (classe == NULL)
         return;
 
     waitAndClear(750);
     //Pesquisa o aluno a ser removido
     tipoAluno* aluno;
+    char op;
     do{
         waitAndClear(500);
         op = ' ';
@@ -433,7 +433,7 @@ tipoAluno* pesquisaAluno(tipoClasse* classe){
     printf("\n===============================================================");
     printf("\nPesquisa de aluno:");
     printf("\n===============================================================\n");
-    printf("\n* Digite o número da matrícula do aluno a ser removido: ");
+    printf("\n* Digite o número da matrícula do aluno: ");
     getline(cin, matricula);
 
     tipoAluno* atual = classe->primeiroAluno;
@@ -464,26 +464,18 @@ int desvinculaAlunoDaClasse(tipoAluno* aluno, tipoClasse* classe){
 
 void exibirListaAlunosDaClasse(tipoLista* lista){
     //Pesquisa a classe que se deseja exibir os alunos
-    tipoClasse* classe;
-    char op;
-    do{
-        waitAndClear(500);
-        op = ' ';
-        classe = pesquisaClasse(lista);
-        if (classe == NULL){
-            printf("\n# Esta classe não existe!!! #\n");
-            printf("\n>> Aperte <ENTER> para pesquisar novamente.\n");
-            printf("\n>> Aperte qualquer outra tecla para voltar ao menu principal.\n");
-            op = getch();
-        }
-    }while (op == '\r');
-
+    tipoClasse* classe = pedeClasse(lista);
     if (classe == NULL)
         return;
 
-    waitAndClear(750);
     //Exibir alunos
-    exibirAlunos(classe);
+    if (classe->qtdAlunos > 0){
+        waitAndClear(750);
+        exibirAlunos(classe);
+    }else{
+        printf("\n-> Não existem alunos matriculados nesta classe!!!\n");
+        printf("\n===============================================================\n");
+    }
     printf("\n>> Aperte qualquer tecla para voltar ao menu principal.");
     getch();
 }
@@ -526,4 +518,45 @@ void exibirClasse(tipoClasse* classe){
     printf("\n   Turma: %c", classe->turma);
     printf("\n   Etapa de ensino: %s", classe->etapa.c_str());
     printf("\n\n===========================================================================\n");
+}
+
+void removeClasse(tipoLista* lista){
+    //Pesquisa a classe que se quer remover
+    tipoClasse* classe = pedeClasse(lista);
+    if (classe == NULL)
+        return;
+
+    //Remove todos os aluno da classe (se houver)
+    while (classe->primeiroAluno != NULL)
+        desvinculaAlunoDaClasse(classe->primeiroAluno, classe);
+
+    waitAndClear(750);
+    //Remove a classe
+    printf("\n===============================================================\n");
+    if (desvinculaClasseDaLista(classe, lista)){
+        printf("\nClasse removida com sucesso!\n");
+    }else{
+        printf("\nNão foi possível remover esta classe!\n");
+    }
+    printf("\n===============================================================\n");
+    printf("\n>> Aperte qualquer tecla para voltar ao menu principal.");
+    getch();
+}
+
+int desvinculaClasseDaLista(tipoClasse* classe, tipoLista* lista){
+    tipoClasse* classeAnt = NULL;
+    if (lista->inicio != classe){
+        classeAnt = lista->inicio;
+        while (classeAnt->proxClasse != classe)
+            classeAnt = classeAnt->proxClasse;
+        classeAnt->proxClasse = classe->proxClasse;
+    }else{
+        lista->inicio = classe->proxClasse;
+    }
+    if (lista->fim == classe)
+        lista->fim = classeAnt;
+    lista->qtdClasses--;
+    delete classe;
+    classe = NULL;
+    return 1;
 }
