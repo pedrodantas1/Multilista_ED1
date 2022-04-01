@@ -213,16 +213,16 @@ void menuCadastroClasse(tipoLista* lista){
     printf("\n>>> Esta classe pertence ao %s.\n", etapa.c_str());
     printf("\n===============================================================\n");
     //Turma
-    printf("\nDigite a turma (A, B, C, ...): ");
+    printf("\n* Digite a turma (A, B, C, ...): ");
     turma = cin.get();
     cin.ignore(100, '\n');
     turma = toupper(turma);
     printf("\n===============================================================\n");
     //Status
     if (cadastrarClasse(lista, prof, etapa, turma, serie)){
-        printf("\nClasse cadastrada com sucesso!\n");
+        printf("\n+ Classe cadastrada com sucesso!\n");
     }else{
-        printf("\nFalha ao cadastrar classe!!!!\n");
+        printf("\n- Falha ao cadastrar classe!!!!\n");
     }
     printf("\n===============================================================\n");
     printf("\n>> Aperte qualquer tecla para voltar ao menu principal.");
@@ -271,9 +271,9 @@ void matriculaAlunoNaClasse(tipoLista* lista){
     //Vincula aluno a classe
     printf("\n===============================================================\n");
     if (vinculaAlunoAClasse(aluno, classe)){
-        printf("\nAluno matriculado com sucesso!\n");
+        printf("\n+ Aluno matriculado com sucesso!\n");
     }else{
-        printf("\nNão foi possível matricular este aluno!\n");
+        printf("\n- Não foi possível matricular este aluno!\n");
     }
     printf("\n===============================================================\n");
     printf("\n>> Aperte qualquer tecla para voltar ao menu principal.");
@@ -417,9 +417,9 @@ void removeAlunoDaClasse(tipoLista* lista){
     //Remover aluno
     printf("\n===============================================================\n");
     if (desvinculaAlunoDaClasse(aluno, classe)){
-        printf("\nAluno removido com sucesso!\n");
+        printf("\n+ Aluno removido com sucesso!\n");
     }else{
-        printf("\nNão foi possível remover este aluno!\n");
+        printf("\n- Não foi possível remover este aluno!\n");
     }
     printf("\n===============================================================\n");
     printf("\n>> Aperte qualquer tecla para voltar ao menu principal.");
@@ -549,7 +549,26 @@ void removeClasse(tipoLista* lista){
     if (classe == NULL)
         return;
 
-    //Remove todos os aluno da classe (se houver)
+    //Verifica se ha alunos na classe e pede a confirmacao de exclusao
+    char op;
+    if (classe->qtdAlunos > 0){
+        printf("\n-> Existe(m) %02d aluno(s) matriculado(s) nesta classe.", classe->qtdAlunos);
+        printf("\n>> Tem certeza que deseja removê-la? <S/N> ");
+        do{
+            op = getch();
+            op = toupper(op);
+        }while (op != 'S' && op != 'N');
+    }
+
+    //Se cancelar a remocao
+    if (op == 'N'){
+        printf("\n\n===============================================================\n");
+        printf("\n>> Aperte qualquer tecla para voltar ao menu principal.");
+        getch();
+        return;
+    }
+
+    //Remove todos os alunos da classe
     while (classe->primeiroAluno != NULL)
         desvinculaAlunoDaClasse(classe->primeiroAluno, classe);
 
@@ -557,9 +576,9 @@ void removeClasse(tipoLista* lista){
     //Remove a classe
     printf("\n===============================================================\n");
     if (desvinculaClasseDaLista(classe, lista)){
-        printf("\nClasse removida com sucesso!\n");
+        printf("\n+ Classe removida com sucesso!\n");
     }else{
-        printf("\nNão foi possível remover esta classe!\n");
+        printf("\n- Não foi possível remover esta classe!\n");
     }
     printf("\n===============================================================\n");
     printf("\n>> Aperte qualquer tecla para voltar ao menu principal.");
@@ -596,7 +615,8 @@ void exibirClasseAlunoDesejado(tipoLista* lista){
         classe = classe->proxClasse;
 
     if (classe != NULL){
-        waitAndClear(500);
+        printf("\n-> Aluno encontrado! Redirecionando para mostrar sua classe...");
+        waitAndClear(2000);
         exibirClasse(classe);
         printf("\n>> Aperte qualquer tecla para voltar ao menu principal.");
         getch();
